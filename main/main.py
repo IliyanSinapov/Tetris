@@ -15,9 +15,14 @@ grid = [
 ]
 
 
-shape = Shape(random.choice(list(ShapeType)), grid, [len(grid), len(grid[0])], screen)
+# shape = Shape(random.choice(list(ShapeType)), grid, [len(grid), len(grid[0])], screen)
 
-grid = shape.get_grid()
+shapes = [Shape(random.choice(list(ShapeType)), grid, [len(grid), len(grid[0])], screen)]
+
+
+def update():
+    if shapes[len(shapes) - 1].hasCollided:
+        shapes.append(Shape(random.choice(list(ShapeType)), grid, [len(grid), len(grid[0])], screen))
 
 while True:
     screen.fill((0, 0, 0))
@@ -26,10 +31,13 @@ while True:
             pygame.quit()
             quit()
 
-    shape.render()
-    shape.update()
+    for i in range(len(shapes) - 1):
+        shapes[i].render()
+        shapes[i].update()
 
-    screen = shape.get_screen()
+    update()
+
+    screen = shapes[len(shapes) - 1].get_screen()
     pygame.display.update()
 
 pygame.quit()

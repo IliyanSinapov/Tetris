@@ -2,6 +2,7 @@ import pygame
 from enum import Enum
 import random
 
+
 class ShapeType(Enum):
     I = 1
     J = 2
@@ -11,16 +12,17 @@ class ShapeType(Enum):
     T = 6
     Z = 7
 
+
 class Shape:
-    def __init__(self, shape_type: ShapeType, grid: list, gridSize: list, screen, hasCollided = False):
+    def __init__(self, shape_type: ShapeType, grid: list, gridSize: list, screen, hasCollided=False):
         self.shape_type = shape_type
         self.hasCollided = hasCollided
         self.grid = grid
         self.screen = screen
 
         self.states = self.get_rotation_states()
-        self.starting_state = self.states[random.randint(0, len(self.states) - 1)]
-        self.gridPosition = [gridSize[1] // 2 - len(self.starting_state[0]) / 2, 0]
+        self.current_state = self.states[random.randint(0, len(self.states) - 1)]
+        self.gridPosition = [int(gridSize[1] // 2) - len(self.current_state[0]) / 2, 0]
         self.shapeBlock = pygame.Rect(self.gridPosition[0] * 20, self.gridPosition[1] * 20, 20, 20)
         self.get_color()
         self.current_rotation = 0
@@ -29,34 +31,46 @@ class Shape:
         self.placeShapeInGrid()
 
     def rotate(self):
-        """Rotate to the next state."""
         self.current_rotation = (self.current_rotation + 1) % len(self.rotation_states)
 
     def update(self):
         if (self.hasCollided):
             return
 
+        if (self.gridPosition[1] <= len(self.grid) - len(self.current_state) + 1):
+            
+            # for i in range(len(self.grid)):
+            #     for j in range(len(self.grid)):
+            #         # self.collisionCheck(self.grid[i][j])
+            #         # print(self.gridPosition)
+            #         # print()
 
-        self.gridPosition[1] += 1
-        self.shapeBlock.x = self.gridPosition[0] * 20
-        self.shapeBlock.y = self.gridPosition[1] * 20
+            self.gridPosition[1] += 1
+            self.shapeBlock.x = self.gridPosition[0] * 20
+            self.shapeBlock.y = self.gridPosition[1] * 20
 
         pygame.time.delay(200)
 
     def render(self):
-        for i in range(len(self.starting_state)):
-            for j in range(len(self.starting_state[0])):
-                if self.starting_state[i][j] == 1:
-                    pygame.draw.rect(self.screen, self.get_color(), pygame.Rect(self.gridPosition[0] * 20 + j * 20, self.gridPosition[1] * 20 + i * 20, 20, 20))
+        for i in range(len(self.current_state)):
+            for j in range(len(self.current_state[0])):
+                if self.current_state[i][j] == 1:
+                    pygame.draw.rect(self.screen, self.get_color(),
+                                     pygame.Rect(self.gridPosition[0] * 20 + j * 20, self.gridPosition[1] * 20 + i * 20,
+                                                 20, 20))
+
+    # def collisionCheck(self, current_grid_space_value: int):
+    #     if self.gridPosition[1] < 20:
+    #         print(self.gridPosition)
+
 
     def placeShapeInGrid(self):
-        for i in range(len(self.starting_state)):
-            for j in range(len(self.starting_state[0])):
-                if self.starting_state[i][j] == 1:
+        for i in range(len(self.current_state)):
+            for j in range(len(self.current_state[0])):
+                if self.current_state[i][j] == 1:
                     self.grid[int(i + self.gridPosition[1])][int(j + self.gridPosition[0])] = 1
 
     def get_color(self):
-        """Assign a color to each shape type."""
         colors = {
             ShapeType.I: (0, 255, 255),  # Cyan
             ShapeType.O: (255, 255, 0),  # Yellow
@@ -69,7 +83,6 @@ class Shape:
         return colors[self.shape_type]
 
     def get_rotation_states(self):
-        """Define the rotation states for each shape."""
         states = {
             ShapeType.I: [
                 [[1, 1, 1, 1]],
@@ -132,8 +145,8 @@ class Shape:
         }
         return states[self.shape_type]
 
-
     def get_grid(self):
         return self.grid
+
     def get_screen(self):
         return pygame.display.get_surface()

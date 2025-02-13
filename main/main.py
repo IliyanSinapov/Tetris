@@ -19,6 +19,7 @@ grid = [
 
 shapes = [Shape(random.choice(list(ShapeType)), grid, [len(grid), len(grid[0])], screen)]
 
+print(shapes[0])
 
 def update():
     if shapes[len(shapes) - 1].hasCollided:
@@ -31,7 +32,7 @@ while True:
             pygame.quit()
             quit()
 
-    for i in range(len(shapes) - 1):
+    for i in range(len(shapes)):
         shapes[i].render()
         shapes[i].update()
 

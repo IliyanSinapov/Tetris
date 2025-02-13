@@ -1,3 +1,5 @@
+from winreg import KEY_CREATE_SUB_KEY
+
 import pygame
 from enum import Enum
 import random
@@ -22,7 +24,7 @@ class Shape:
 
         self.states = self.get_rotation_states()
         self.current_state = self.states[random.randint(0, len(self.states) - 1)]
-        self.gridPosition = [int(gridSize[1] // 2) - len(self.current_state[0]) / 2, 0]
+        self.gridPosition = [int(gridSize[1] / 2) - len(self.current_state[0]) / 2, 0]
         self.shapeBlock = pygame.Rect(self.gridPosition[0] * 20, self.gridPosition[1] * 20, 20, 20)
         self.get_color()
         self.current_rotation = 0
@@ -49,7 +51,30 @@ class Shape:
             self.shapeBlock.x = self.gridPosition[0] * 20
             self.shapeBlock.y = self.gridPosition[1] * 20
 
-        pygame.time.delay(200)
+        else:
+            self.hasCollided = True
+
+        self.move()
+
+        pygame.display.flip()
+        pygame.time.delay(100)
+
+    def move(self):
+        keys = pygame.key.get_pressed()
+
+        if (keys[pygame.K_LEFT] and not self.hasCollided):
+            if (self.gridPosition[0] - 1 >= 0) :
+                self.gridPosition[0] = int(self.gridPosition[0] - 1)
+
+        if (keys[pygame.K_RIGHT] and not self.hasCollided):
+            if (self.gridPosition[0] + 1 <= len(self.grid) - len(self.current_state)) :
+                self.gridPosition[0] = int(self.gridPosition[0] + 1)
+
+        if (keys[pygame.K_UP]):
+            if (self.states.index(self.current_state) == len(self.states) - 1):
+                self.current_state = self.states[0]
+            else:
+                self.current_state = self.states[self.states.index(self.current_state) + 1]
 
     def render(self):
         for i in range(len(self.current_state)):
@@ -58,11 +83,6 @@ class Shape:
                     pygame.draw.rect(self.screen, self.get_color(),
                                      pygame.Rect(self.gridPosition[0] * 20 + j * 20, self.gridPosition[1] * 20 + i * 20,
                                                  20, 20))
-
-    # def collisionCheck(self, current_grid_space_value: int):
-    #     if self.gridPosition[1] < 20:
-    #         print(self.gridPosition)
-
 
     def placeShapeInGrid(self):
         for i in range(len(self.current_state)):
